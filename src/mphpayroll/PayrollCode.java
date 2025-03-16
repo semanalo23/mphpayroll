@@ -11,8 +11,6 @@ public class PayrollCode {
 
         // Store Employee Hourly Rates
         Map<Integer, Double> hourlyRates = new HashMap<>();
-        
-     // Store Total Net Salary per Employee
         Map<Integer, Double> totalSalary = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(employeesFile))) {
@@ -40,29 +38,27 @@ public class PayrollCode {
 
                 double hoursWorked = calculateHoursWorked(loginTime, logoutTime);
                 double grossSalary = hoursWorked * hourlyRates.getOrDefault(empId, 0.0);
-
-                // Calculate Deductions
                 double deductions = calculateDeductions(grossSalary);
                 double netSalary = grossSalary - deductions;
-                
-             // Accumulate total salary per employee
+
                 totalSalary.put(empId, totalSalary.getOrDefault(empId, 0.0) + netSalary);
 
-                System.out.printf("%d | %.2f hours | PHP %.2f | PHP %.2f | PHP %.2f%n", 
+                System.out.printf("%d | %.2f hours | PHP %.2f | PHP %.2f | PHP %.2f%n",
                                   empId, hoursWorked, grossSalary, deductions, netSalary);
             }
         } catch (IOException e) {
             System.out.println("Error reading attendance file.");
             e.printStackTrace();
-            
-            System.out.println("\nTotal Salary Per Employee:");
-            for (Map.Entry<Integer, Double> entry : totalSalary.entrySet()) {
-                System.out.printf("Employee %d | Total Net Salary: PHP %.2f%n", entry.getKey(), entry.getValue());
-            }
+        }
+
+        // Print total salary per employee
+        System.out.println("\nTotal Salary Per Employee:");
+        for (Map.Entry<Integer, Double> entry : totalSalary.entrySet()) {
+            System.out.printf("Employee %d | Total Net Salary: PHP %.2f%n", entry.getKey(), entry.getValue());
         }
     }
 
-    // Convert time strings to total hours worked
+    // **Method to Calculate Hours Worked**
     public static double calculateHoursWorked(String login, String logout) {
         String[] inParts = login.split(":");
         String[] outParts = logout.split(":");
@@ -78,7 +74,7 @@ public class PayrollCode {
         return outTime - inTime;
     }
 
-    // **Correctly Defined Deduction Calculation Method**
+    // **Method to Calculate Deductions**
     public static double calculateDeductions(double grossSalary) {
         double tax = grossSalary * 0.10;       // 10% Tax
         double sss = 500.0;                    // Fixed SSS deduction
